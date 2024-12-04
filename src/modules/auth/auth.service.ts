@@ -11,7 +11,7 @@ import { InvalidCredentialsException, UsernameAlreadyExistsException } from '@/l
 import { SignInDto } from '@/modules/auth/dto/sign-in.dto';
 import { SignUpDto } from '@/modules/auth/dto/sign-up.dto';
 
-import { User } from '@/modules/auth/schemas/user.schema';
+import { User, UserDocument } from '@/modules/auth/schemas/user.schema';
 
 import { SignInResponse, SignUpResponse } from '@/modules/auth/types/response.type';
 
@@ -23,6 +23,14 @@ export class AuthService {
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
   ) {}
+
+  async getUserByIds(ids: string[]): Promise<UserDocument[]> {
+    return this.userModel.find({ _id: { $in: ids } });
+  }
+
+  async getUserById(id: string): Promise<UserDocument | null> {
+    return this.userModel.findById(id);
+  }
 
   async signUp(dto: SignUpDto): Promise<SignUpResponse> {
     const { username, password } = dto;

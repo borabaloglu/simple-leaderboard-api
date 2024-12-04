@@ -5,15 +5,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, MongooseError } from 'mongoose';
 
 import { AuthPayload } from '@/libs/decorators/current-user.decorator';
-import { UserNotFoundException, UserScoreAlreadyExistsException } from '@/libs/exceptions/leaderboard.exception';
+import { UserHasNoScoreException, UserScoreAlreadyExistsException } from '@/libs/exceptions/leaderboard.exception';
 
 import { SubmitScoreDto } from '@/modules/leaderboard/dto/submit-score.dto';
 import { GetLeaderboardQueryDto } from '@/modules/leaderboard/dto/get-leaderboard-query.dto';
 import { GetUserRankQueryDto } from '@/modules/leaderboard/dto/get-user-rank-query.dto';
 
-import { UserRank } from '@/modules/leaderboard/interfaces/user-rank.interface';
-
 import { UserScore, UserScoreDocument } from '@/modules/leaderboard/schemas/user-score.schema';
+
+import { AuthService } from '@/modules/auth/auth.service';
 
 import {
   GetLeaderboardResponse,
@@ -26,6 +26,7 @@ export class LeaderboardService {
   private readonly LEADERBOARD_KEY = 'leaderboard';
 
   constructor(
+    private readonly authService: AuthService,
     @InjectModel(UserScore.name)
     private readonly userScoreModel: Model<UserScoreDocument>,
     @Inject('REDIS_CLIENT')
@@ -40,15 +41,19 @@ export class LeaderboardService {
 
     const results = await this.redis.zrevrange(this.LEADERBOARD_KEY, start, stop, 'WITHSCORES');
 
-    const entries: UserRank[] = [];
+    const entries: GetLeaderboardResponse = [];
+
+    const ids = results.filter((_, index) => index % 2 === 0);
+    const users = await this.authService.getUserByIds(ids);
 
     for (let i = 0; i < results.length; i += 2) {
       const userId = results[i];
+      const user = users.find((user) => user.id === userId);
       const score = parseFloat(results[i + 1]);
       const rank = start + entries.length + 1;
 
       entries.push({
-        userId,
+        username: user.username,
         score,
         rank,
       });
@@ -65,7 +70,7 @@ export class LeaderboardService {
       this.redis.zrevrank(this.LEADERBOARD_KEY, userId),
     ]);
 
-    if (score === null || rank === null) throw new UserNotFoundException(userId);
+    if (score === null || rank === null) throw new UserHasNoScoreException(userId);
 
     return {
       userId,

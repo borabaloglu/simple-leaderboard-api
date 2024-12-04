@@ -3,15 +3,15 @@ import { HttpStatus } from '@nestjs/common';
 import { BaseException } from '@/libs/exceptions/base.exception';
 
 export enum LeaderboardExceptionName {
-  USER_NOT_FOUND_EXCEPTION = 'USER_NOT_FOUND_EXCEPTION',
+  USER_HAS_NO_SCORE_EXCEPTION = 'USER_HAS_NO_SCORE_EXCEPTION',
   USER_SCORE_ALREADY_EXISTS_EXCEPTION = 'USER_SCORE_ALREADY_EXISTS_EXCEPTION',
 }
 
-export class UserNotFoundException extends BaseException {
+export class UserHasNoScoreException extends BaseException {
   constructor(userId: string) {
-    const name = LeaderboardExceptionName.USER_NOT_FOUND_EXCEPTION;
+    const name = LeaderboardExceptionName.USER_HAS_NO_SCORE_EXCEPTION;
     const status = HttpStatus.NOT_FOUND;
-    super(name, status, `"${userId}" is not found`);
+    super(name, status, `User "${userId}" has no score`);
   }
 }
 
