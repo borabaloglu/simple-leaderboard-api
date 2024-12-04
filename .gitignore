@@ -62,3 +62,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # scripts
 scripts/*
 !scripts/dump-data.ts
+
+# CSV files
+leaderboard.users.csv

@@ -61,15 +61,16 @@ To dump data into the API:
    Make sure the API is running locally or in Docker before proceeding.
 
 2. **Run the Script**:
-   Execute the following command:
+   Execute the following command in the root directory of the project:
    ```bash
    npx ts-node scripts/dump-data.ts
    ```
 
 This script will:
-- Create 10 test users (testuser0 through testuser9)
-- Generate 10 random scores for each user
+- Create 20 test users (testuser1 through testuser20)
+- Generate 5 random scores for each user
 - Submit the scores to the leaderboard
+- Export the user data to a CSV file (`leaderboard.users.csv`) for testing purposes
 
 You can verify the data by checking the leaderboard endpoints after running the script.
 
@@ -85,3 +86,4 @@ The Postman collection provides a structured way to test and interact with the A
 
 - **Testing Endpoints**: Each request in the collection is organized by functionality (Auth and Leaderboard). You can easily send requests, view responses, and test the API's behavior.
 
+- **Sample Responses**: The collection includes sample responses for the leaderboard endpoints. These responses can be used as reference for expected output.
